@@ -1,4 +1,3 @@
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Main {
@@ -7,33 +6,58 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner inputScanner = new Scanner(System.in);
-        try {
-            System.out.println(calc(inputScanner.nextLine()));
-        } catch (NoSuchElementException e) {
-            System.out.println("throws Exception");
-        }
-
+        System.out.println(calc(inputScanner.nextLine()));
     }
 
-    public static String convert (int num){
-        if (num < 1)
-            try {
-                throw new InvalidValueException();
-            } catch (InvalidValueException e) {
-                return "throws Exception";
-            }
+    public static String convert (int num) throws InvalidValueException{
+        if (num < 1) {
+            throw new InvalidValueException("throws InvalidValueException: " +
+                    "Римские числа могут быть только положительными");
+        }
+        return num != 100 ? romanTen[num / 10] + romanDigit[num % 10] : "C";
+    }
 
-        return num != 100 ? romanTen[num % 100 / 10] + romanDigit[num % 10] : "C";
+    public static void valueCheck (int number) throws InvalidValueException{
+        if (number < 1 || number > 10){
+            throw new InvalidValueException("throws InvalidValueException: Введены неверные значения операндов");
+        }
+    }
+
+    public static void romanModeCheck (boolean romanNum1, boolean romanNum2) throws DifferentTypesValuesException{
+        if (!((romanNum1 && romanNum2) || (!romanNum1 && !romanNum2))){
+            throw new DifferentTypesValuesException("throws DifferentTypesValuesException: " +
+                    "Введены разные типы операндов");
+        }
+    }
+
+    public static void signCheck (String answer) throws WrongSignException {
+        if(answer == null){
+            throw new WrongSignException("throws WrongSignException: Введен неверный знак");
+        }
+    }
+
+    public static void expressionCheck (String input) throws InvalidExpressionException {
+        String[] inputArray = input.split(" ");
+        if (inputArray.length != 3){
+            throw new InvalidExpressionException("throws InvalidExpressionException: Введено неверное выражение");
+        }
     }
 
     public static String calc(String input){
-        int num1 = 0, num2 = 0;
-        String sign, answer, temp;
-        boolean romanMode = false;
+        try {
+            expressionCheck(input);
+        } catch (InvalidExpressionException e) {
+            return e.getMessage();
+        }
+
         Scanner stringScanner = new Scanner(input);
 
-        if (stringScanner.hasNextInt())
+        int num1 = 0;
+        String temp;
+        boolean romanNum1 = false;
+        if (stringScanner.hasNextInt()) {
             num1 = stringScanner.nextInt();
+        }
         else {
             temp = stringScanner.next();
             for (int i = 0; i < romanDigit.length; i++) {
@@ -45,35 +69,32 @@ public class Main {
                     break;
                 }
             }
-            romanMode = true;
+            romanNum1 = true;
         }
-        if (num1 < 1 || num1 > 10)
-            try {
-                throw new InvalidValueException();
-            } catch (InvalidValueException e) {
-                return "throws Exception";
-            }
+        try {
+            valueCheck(num1);
+        } catch (InvalidValueException e) {
+            return e.getMessage();
+        }
 
-        sign = stringScanner.next();
+        String sign = stringScanner.next();
 
+        int num2 = 0;
+        boolean romanNum2 = false;
         if (stringScanner.hasNextInt()) {
             num2 = stringScanner.nextInt();
-
-            if (romanMode)
-                try {
-                    throw new DifferentTypesValuesException();
-                } catch (DifferentTypesValuesException e) {
-                    return "throws Exception";
-                }
+            try {
+                romanModeCheck(romanNum1,romanNum2);
+            } catch (DifferentTypesValuesException e) {
+                return e.getMessage();
+            }
+            try {
+                valueCheck(num2);
+            } catch (InvalidValueException e) {
+                return e.getMessage();
+            }
         }
         else {
-            if (!romanMode)
-                try {
-                    throw new DifferentTypesValuesException();
-                } catch (DifferentTypesValuesException e) {
-                    return "throws Exception";
-                }
-
             temp = stringScanner.next();
             for (int i = 0; i < romanDigit.length; i++) {
                 if (temp.equals(romanDigit[i])){
@@ -84,13 +105,21 @@ public class Main {
                     break;
                 }
             }
-        }
-        if (num2 < 1 || num2 > 10)
             try {
-                throw new InvalidValueException();
+                valueCheck(num2);
             } catch (InvalidValueException e) {
-                return "throws Exception";
+                return e.getMessage();
             }
+            romanNum2 = true;
+            try {
+                romanModeCheck(romanNum1,romanNum2);
+            } catch (DifferentTypesValuesException e) {
+                return e.getMessage();
+            }
+        }
+
+
+        String answer;
         answer = switch (sign) {
             case "+" -> "" + (num1 + num2);
             case "-" -> "" + (num1 - num2);
@@ -98,12 +127,20 @@ public class Main {
             case "/" -> "" + (num1 / num2);
             default -> null;
         };
-        if(answer == null)
+
+        try {
+            signCheck(answer);
+        } catch (WrongSignException e) {
+            return e.getMessage();
+        }
+
+        if (romanNum1 && romanNum2){
             try {
-                throw new WrongSignException();
-            } catch (WrongSignException e) {
-                return "throws Exception";
+                 return convert(Integer.parseInt(answer));
+            } catch (InvalidValueException e) {
+                return e.getMessage();
             }
-        return romanMode ? convert(Integer.parseInt(answer)) : answer;
+        }
+        return answer;
     }
 }
