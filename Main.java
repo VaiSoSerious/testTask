@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -9,7 +10,7 @@ public class Main {
         System.out.println(calc(inputScanner.nextLine()));
     }
 
-    public static String convert (int num) {
+    public static String convertToRoman (int num) {
         if (num < 1) {
             throw new InvalidValueException("throws InvalidValueException: " +
                     "Римские числа могут быть только положительными");
@@ -42,82 +43,89 @@ public class Main {
             throw new InvalidExpressionException("throws InvalidExpressionException: Введено неверное выражение");
         }
     }
+    public static int convertToArab(String romanNumber){
+        int arabNumber = 0;
+        for (int i = 0; i < romanDigit.length; i++) {
+            if (romanNumber.equals(romanDigit[i])){
+                arabNumber = i;
+                break;
+            } else if (romanNumber.equals("X")) {
+                arabNumber = 10;
+                break;
+            }
+        }
+        return arabNumber;
+    }
+
+    public static void operandCheck(int number, boolean romanNum1, boolean romanNum2){
+        if (romanNum2){
+            try {
+                valueCheck(number);
+            } catch (InvalidValueException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
+            try {
+                romanModeCheck(romanNum1,romanNum2);
+            } catch (DifferentTypesValuesException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
+        } else {
+            try {
+                romanModeCheck(romanNum1,romanNum2);
+            } catch (DifferentTypesValuesException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
+            try {
+                valueCheck(number);
+            } catch (InvalidValueException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
+        }
+    }
 
     public static String calc(String input){
         try {
             expressionCheck(input);
         } catch (InvalidExpressionException e) {
-            return e.getMessage();
+            System.out.println(e.getMessage());
+            System.exit(0);
         }
 
         Scanner stringScanner = new Scanner(input);
 
-        int num1 = 0;
-        String temp;
+        int num1;
         boolean romanNum1 = false;
         if (stringScanner.hasNextInt()) {
             num1 = stringScanner.nextInt();
         }
         else {
-            temp = stringScanner.next();
-            for (int i = 0; i < romanDigit.length; i++) {
-                if (temp.equals(romanDigit[i])){
-                    num1 = i;
-                    break;
-                } else if (temp.equals("X")) {
-                    num1 = 10;
-                    break;
-                }
-            }
+            num1 = convertToArab(stringScanner.next());
             romanNum1 = true;
         }
         try {
             valueCheck(num1);
         } catch (InvalidValueException e) {
-            return e.getMessage();
+            System.out.println(e.getMessage());
+            System.exit(0);
         }
 
         String sign = stringScanner.next();
 
-        int num2 = 0;
+        int num2;
         boolean romanNum2 = false;
         if (stringScanner.hasNextInt()) {
             num2 = stringScanner.nextInt();
-            try {
-                romanModeCheck(romanNum1,romanNum2);
-            } catch (DifferentTypesValuesException e) {
-                return e.getMessage();
-            }
-            try {
-                valueCheck(num2);
-            } catch (InvalidValueException e) {
-                return e.getMessage();
-            }
+            operandCheck(num2,romanNum1,romanNum2);
         }
         else {
-            temp = stringScanner.next();
-            for (int i = 0; i < romanDigit.length; i++) {
-                if (temp.equals(romanDigit[i])){
-                    num2 = i;
-                    break;
-                } else if (temp.equals("X")) {
-                    num2 = 10;
-                    break;
-                }
-            }
-            try {
-                valueCheck(num2);
-            } catch (InvalidValueException e) {
-                return e.getMessage();
-            }
             romanNum2 = true;
-            try {
-                romanModeCheck(romanNum1,romanNum2);
-            } catch (DifferentTypesValuesException e) {
-                return e.getMessage();
-            }
+            num2 = convertToArab(stringScanner.next());
+            operandCheck(num2,romanNum1,romanNum2);
         }
-
 
         String answer;
         answer = switch (sign) {
@@ -127,18 +135,18 @@ public class Main {
             case "/" -> "" + (num1 / num2);
             default -> null;
         };
-
         try {
             signCheck(answer);
         } catch (WrongSignException e) {
-            return e.getMessage();
+            System.out.println(e.getMessage());
+            System.exit(0);
         }
-
         if (romanNum1 && romanNum2){
             try {
-                 return convert(Integer.parseInt(answer));
+                 return convertToRoman(Integer.parseInt(answer));
             } catch (InvalidValueException e) {
-                return e.getMessage();
+                System.out.println(e.getMessage());
+                System.exit(0);
             }
         }
         return answer;
