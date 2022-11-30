@@ -144,3 +144,27 @@ public class Main {
         return answer;
     }
 }
+
+class InvalidExpressionException extends RuntimeException {
+    public InvalidExpressionException(String description){
+        super(description);
+    }
+}
+
+class WrongSignException extends RuntimeException{
+    public WrongSignException(String description){
+        super(description);
+    }
+}
+
+class DifferentTypesValuesException extends RuntimeException{
+    public DifferentTypesValuesException(String description){
+        super(description);
+    }
+}
+
+class InvalidValueException extends RuntimeException{
+    public InvalidValueException(String description){
+        super(description);
+    }
+}
