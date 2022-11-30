@@ -9,7 +9,7 @@ public class Main {
         System.out.println(calc(inputScanner.nextLine()));
     }
 
-    public static String convert (int num) throws InvalidValueException{
+    public static String convert (int num) {
         if (num < 1) {
             throw new InvalidValueException("throws InvalidValueException: " +
                     "Римские числа могут быть только положительными");
@@ -17,26 +17,26 @@ public class Main {
         return num != 100 ? romanTen[num / 10] + romanDigit[num % 10] : "C";
     }
 
-    public static void valueCheck (int number) throws InvalidValueException{
+    public static void valueCheck (int number) {
         if (number < 1 || number > 10){
             throw new InvalidValueException("throws InvalidValueException: Введены неверные значения операндов");
         }
     }
 
-    public static void romanModeCheck (boolean romanNum1, boolean romanNum2) throws DifferentTypesValuesException{
+    public static void romanModeCheck (boolean romanNum1, boolean romanNum2) {
         if (!((romanNum1 && romanNum2) || (!romanNum1 && !romanNum2))){
             throw new DifferentTypesValuesException("throws DifferentTypesValuesException: " +
                     "Введены разные типы операндов");
         }
     }
 
-    public static void signCheck (String answer) throws WrongSignException {
+    public static void signCheck (String answer) {
         if(answer == null){
             throw new WrongSignException("throws WrongSignException: Введен неверный знак");
         }
     }
 
-    public static void expressionCheck (String input) throws InvalidExpressionException {
+    public static void expressionCheck (String input) {
         String[] inputArray = input.split(" ");
         if (inputArray.length != 3){
             throw new InvalidExpressionException("throws InvalidExpressionException: Введено неверное выражение");
